@@ -1,4 +1,19 @@
 
+const productionErros = (err, res) => {
+	res.status(err.statusCode).json({
+		status: "fail",
+	})
+}
+
+const developementErrors = (err, res) => {
+	res.status(err.statusCode).jsob({
+		status: err.status,
+		message: err.message,
+		stack: err.stack,
+		err: err
+	})
+}
+
 const apiErrors = (err, req, res, next) => {
 	const statusCode = err.statusCode || 500;
 
