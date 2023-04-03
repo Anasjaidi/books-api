@@ -23,3 +23,5 @@ app.use("/api/v1/books", BooksRouter)
 */
 
 app.use(errorsController)
+
+module.exports = app

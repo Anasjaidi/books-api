@@ -4,9 +4,9 @@ const express = require("express");
 const router = express.Router()
 
 
-router().route("/")
+router.route("/")
         .get()
-        .post()
-        .delete()
+        // .post()
+        // .delete()
 
-module.export = router
+module.exports = router

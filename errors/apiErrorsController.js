@@ -14,7 +14,7 @@ const developementErrors = (err, res) => {
 	})
 }
 
-export const errorsController = (err, req, res, next) => {
+exports.errorsController = (err, req, res, next) => {
 	const statusCode = err.statusCode || 500;
 
 	const status = err.status || "error";
