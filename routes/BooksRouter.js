@@ -1,11 +1,11 @@
 const express = require("express");
-
+const {getAllBooks} = require('./../controllers/BooksControllers');
 
 const router = express.Router()
 
 
 router.route("/")
-        .get()
+        .get(getAllBooks)
         // .post()
         // .delete()
 

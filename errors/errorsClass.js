@@ -1,4 +1,4 @@
-export class AppError {
+module.exports.AppError = class extends Error {
   constructor(statusCode, message) {
     super(message)
     this.statusCode = statusCode

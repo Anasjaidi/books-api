@@ -6,7 +6,7 @@ const productionErros = (err, res) => {
 }
 
 const developementErrors = (err, res) => {
-	res.status(err.statusCode).jsob({
+	res.status(err.statusCode).json({
 		status: err.status,
 		message: err.message,
 		stack: err.stack,
