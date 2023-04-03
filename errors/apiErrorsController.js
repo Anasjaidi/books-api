@@ -14,7 +14,7 @@ const developementErrors = (err, res) => {
 	})
 }
 
-const apiErrors = (err, req, res, next) => {
+export const errorsController = (err, req, res, next) => {
 	const statusCode = err.statusCode || 500;
 
 	const status = err.status || "error";
@@ -25,6 +25,3 @@ const apiErrors = (err, req, res, next) => {
     productionErros(err, res)
   }
 };
-
-
-module.exp

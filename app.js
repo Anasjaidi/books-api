@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
-const BooksRouter = require("./routes/BooksRouter")
+const BooksRouter = require("./routes/BooksRouter");
+const { errorsController } = require("./errors/apiErrorsController");
 
 const app = express()
 
@@ -21,6 +22,4 @@ app.use("/api/v1/books", BooksRouter)
  * start default route
 */
 
-app.use("*", (err, req, res, next) => {
-  
-})
+app.use(errorsController)
