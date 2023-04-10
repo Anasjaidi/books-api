@@ -10,6 +10,9 @@ class UserDAO {
   async findUserById(ID) {
     return await this.users.findUnique({where: {uid : ID}})
   }
+  async findUserByEmail(email) {
+    return await this.users.findUnique({where: {email : email}})
+  }
 }
 
 const userDAO = new UserDAO();

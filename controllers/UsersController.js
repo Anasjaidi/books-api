@@ -1,10 +1,19 @@
 const auth = require('../auth/Auth')
-const addNewUser = async (req, res,  next) => {
+const ErrorsWrapper = require('../errors/errorsWrapper')
+const addNewUser = ErrorsWrapper(async (req, res,  next) => {
     const user = await auth.signup(req.body)
     res.status(201).json({
         status: "success",
         data: user
     })
-}
+})
 
-module.exports = {addNewUser}
+const signNewUser = ErrorsWrapper(async (req, res,  next) => {
+    const user = await auth.signin(req.body)
+    res.status(201).json({
+        status: "success",
+        data: user
+    })
+})
+
+module.exports = {addNewUser, signNewUser}

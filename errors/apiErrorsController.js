@@ -29,14 +29,24 @@ const developementErrors = (err, res) => {
 	}
 }
 
+const uniqueFieldPrismaError = (err, res) => {
+	res.status(400).json({
+		status: 'fail',
+		message: err.meta.target.join(', ') + " needs to be unique."
+	})
+}
+
 exports.errorsController = (err, req, res, next) => {
 	const statusCode = err.statusCode || 500;
 
 	const status = err.status || "error";
 
-	if (process.env.NODE_ENV = "dev") {
+	if (process.env.NODE_ENV === "dev") {
 		developementErrors(err, res)
-  } else if (process.env.NODE_ENV == "production") {
+  } else if (process.env.NODE_ENV === "production") {
+		if (err.code  === "P2002") {
+			return uniqueFieldPrismaError(err, res)
+		}
     productionErros(err, res)
   }
 };
