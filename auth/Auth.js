@@ -1,7 +1,7 @@
 const userDAO = require('../repository/userDAO')
 const bcrypt = require('bcryptjs')
 const AppError = require('../errors/errorsClass')
-
+const {promisify} = require('util')
 const jwt = require('jsonwebtoken')
 class Auth {
 
@@ -43,6 +43,9 @@ class Auth {
     return await this.generateToken(u.uid, process.env.JWT_EXPIRE_IN, process.env.JWT_SECRET_KEY)
   }
 
+  async validateToken(token, SECRET_KEY) {
+    return jwt.verify(token, SECRET_KEY);
+  }
   async protectResource(req, res, next) {
     let token = req.headers.authorization;
 
@@ -57,10 +60,21 @@ class Auth {
     if (!token) {
       next( new AppError(400, "please provide a valid token."))
     }
+    const decoded = await promisify(jwt.verify)(
+        token,
+        process.env.JWT_SECRET_KEY
+    );
 
-    const decoded = this.validateToken(token, "ok")
+    const user = await userDAO.findUserById(decoded.id);
 
-    console.log(decoded)
+    if (!user) {
+      next(new AppError(401, "user deleted after sign token."))
+    } else if (user.passwordChangeAt) {
+      if (parseInt(user.passwordChangeAt.getTime() / 1000, 10) > decoded.iat)
+        next(new AppError(401, "password changes after the token was issued please, re sign in."));
+    }
+
+    req.user = user
     next()
   }
   async passwordIsValid(candidatePassword, password) {
@@ -74,9 +88,6 @@ class Auth {
     return  jwt.sign({id: payload}, SECRET_KEY, {expiresIn: EXPIRE_DATE})
   }
 
-  async validateToken(token, SECRET_KEY) {
-    return jwt.verify(token, SECRET_KEY);
-  }
 }
 
 const auth = new Auth();

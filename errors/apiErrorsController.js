@@ -36,6 +36,20 @@ const uniqueFieldPrismaError = (err, res) => {
 	})
 }
 
+const jwtInvalidTokenError = (err, res) => {
+	res.status(401).json({
+		status: 'fail',
+		message: "invalid token."
+	})
+}
+
+const jwtExpiredTokenError = (err, res) => {
+	res.status(401).json({
+		status: 'fail',
+		message: "token is expired please re login."
+	})
+}
+
 exports.errorsController = (err, req, res, next) => {
 	err.statusCode = err.statusCode || 500;
 
@@ -46,6 +60,10 @@ exports.errorsController = (err, req, res, next) => {
   } else if (process.env.NODE_ENV === "production") {
 		if (err.code  === "P2002") {
 			return uniqueFieldPrismaError(err, res)
+		} else if (err.name === "JsonWebTokenError") {
+			return jwtInvalidTokenError(err, res)
+		} else if (err.name === "TokenExpiredError") {
+			return  jwtExpiredTokenError(err, res)
 		}
     productionErros(err, res)
   }
