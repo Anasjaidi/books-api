@@ -1,6 +1,6 @@
 
 const productionErros = (err, res) => {
-	res.status(err.status).json({
+	res.status(err.statusCode).json({
 		status: err.status,
 		message: err.message,
 		stack: err.stack,
@@ -37,9 +37,9 @@ const uniqueFieldPrismaError = (err, res) => {
 }
 
 exports.errorsController = (err, req, res, next) => {
-	const statusCode = err.statusCode || 500;
+	err.statusCode = err.statusCode || 500;
 
-	const status = err.status || "error";
+	err.status = err.status || "error";
 
 	if (process.env.NODE_ENV === "dev") {
 		developementErrors(err, res)

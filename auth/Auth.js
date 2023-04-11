@@ -13,21 +13,28 @@ class Auth {
 
     const password = await this.hash(user.password, 12)
 
-    return await userDAO.addNewUser({
+    const newUser = await userDAO.addNewUser({
       firstName,
       lastName,
       email,
       password
     })
-
+  const token = this.generateToken(newUser.uid, process.env.JWT_EXPIRE_IN, process.env.JWT_SECRET_KEY)
+  return {
+      token,
+      newUser
   }
+}
 
   async signin(user) {
     const {email, password} = user
 
     const u = await  userDAO.findUserByEmail(email)
 
-    if (!u || !await this.passwordIsValid(u.password, password)) {
+    console.log(u)
+    console.log(password, email)
+
+    if (!u || !(await this.passwordIsValid(password, u.password))) {
       throw new AppError(400, "email or password are not valid")
     }
 
@@ -40,7 +47,7 @@ class Auth {
     return await bcrypt.hash(payload, salt)
   }
 
-  async generateToken(payload, EXPIRE_DATE, SECRET_KEY) {
+  generateToken(payload, EXPIRE_DATE, SECRET_KEY) {
     return  jwt.sign({id: payload}, SECRET_KEY, {expiresIn: EXPIRE_DATE})
   }
 }
