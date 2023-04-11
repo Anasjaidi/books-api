@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const BooksRouter = require("./routes/BooksRouter");
 const { errorsController } = require("./errors/apiErrorsController");
-const { AppError } = require("./errors/errorsClass");
+const  AppError  = require("./errors/errorsClass");
 const UserRouter = require('./routes/UserRouter')
 const app = express()
 
