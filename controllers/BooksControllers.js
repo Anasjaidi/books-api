@@ -11,5 +11,15 @@ module.exports.getAllBooks = errorsWrapper(async (req, res, next) => {
     data: books
   })
 });
+
+
+module.exports.addNewBook = errorsWrapper(async (req, res, next) => {
+  const book = await bookDAO.addNewBook(req.body);
+
+  res.status(201).json({
+    status: "success",
+    data: book
+  })
+})
 const deleteAllBooks = errorsWrapper(async (req, res, next) => {});
 const addNewBook = errorsWrapper(async (req, res, next) => {});

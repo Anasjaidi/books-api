@@ -4,7 +4,7 @@ class BookDAO {
     constructor() {
         this.books = prisma.book
 
-        console.log("books " + this.books )
+        console.log("books " + this.books)
     }
 
     async getAllBooks() {
@@ -12,8 +12,51 @@ class BookDAO {
     }
 
     async addNewBook(book) {
-        const {title, language, publication_date, num_pages, }
-        return await this.books.create({data: })
+        let {
+            title,
+            language,
+            publication_date: publicationDate,
+            num_pages: numPages,
+            authorUid,
+            publisherUid,
+            coverImagePath,
+            downloadPath,
+            previewPath,
+            author,
+            genres,
+            genresIds
+        } = book
+
+
+        return await this.books.create({
+            data: {
+                title,
+                language,
+                publicationDate,
+                numPages,
+                coverImagePath,
+                downloadPath,
+                previewPath,
+                num_downloads: 0,
+                author: {
+                    connect: authorUid ? {uid: authorUid} : undefined,
+                    create: author ? {name: author.name, bio: author.bio} : undefined
+                },
+                publisher : {
+                    connect: {uid: publisherUid}
+                },
+                genres: {
+                    connect: genresIds ? genresIds.map(genre => {uid: genre}): undefined,
+                    create: genres ? genres.map(genre => ({name: genre.name,  description: genre.description})) : undefined
+                },
+
+            },
+            include: {
+                genres: true,
+                author: true,
+                publisher: true
+            }
+        })
     }
 }
 
