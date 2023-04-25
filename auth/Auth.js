@@ -50,15 +50,15 @@ class Auth {
     let token = req.headers.authorization;
 
     if (!token) {
-      next(new AppError(400, "please provide a token."))
+      return next(new AppError(400, "please provide a token."))
     } else if (!token.startsWith("Bearer")) {
-      next( new AppError(400, "please provide a valid token."))
+      return next(new AppError(400, "please provide a valid token."));
     }
 
     token = token.split(' ')[1]
 
     if (!token) {
-      next( new AppError(400, "please provide a valid token."))
+      return next(new AppError(400, "please provide a valid token."));
     }
     const decoded = await promisify(jwt.verify)(
         token,
@@ -68,10 +68,15 @@ class Auth {
     const user = await userDAO.findUserById(decoded.id);
 
     if (!user) {
-      next(new AppError(401, "user deleted after sign token."))
+      return next(new AppError(401, "user deleted after sign token."));
     } else if (user.passwordChangeAt) {
       if (parseInt(user.passwordChangeAt.getTime() / 1000, 10) > decoded.iat)
-        next(new AppError(401, "password changes after the token was issued please, re sign in."));
+        return next(
+					new AppError(
+						401,
+						"password changes after the token was issued please, re sign in."
+					)
+				);
     }
 
     req.user = user

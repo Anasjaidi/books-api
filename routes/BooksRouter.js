@@ -8,5 +8,6 @@ router.route("/")
         .get(ErrorWrapper(auth.protectResource), booksController.getAllBooks)
         .post(booksController.addNewBook)
         // .delete()
+router.route('/:bookId').get()
 
 module.exports = router
