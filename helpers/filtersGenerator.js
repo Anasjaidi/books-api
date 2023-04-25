@@ -2,6 +2,86 @@ class PrismaFiltersGenerator {
 	constructor() {
 		this.query;
 	}
+	// $realtionManyTable|FieldConstraint
+
+	generateRealtionFilter(key, value) {
+		key = key.replace("$relation", "");
+
+		if (key.startsWith("Many")) {
+      key = key.replace("Many", "")
+      const parts = key.split("|")
+      return { [parts[0]]: { some: this.generateFilter(parts[1], value) } };
+		} else if (key.startsWith("One")) {
+      key = key.replace("One", "");
+
+		}
+	}
+
+	generateFilter(key, value) {
+		if (key.endsWith("GreaterThanEqual")) {
+			key = key.replace("GreaterThanEqual", "");
+			return {
+				[key]: { gte: value },
+			};
+		} else if (key.endsWith("GreaterThan")) {
+			key = key.replace("GreaterThan", "");
+			return {
+				[key]: { gt: value },
+			};
+		} else if (key.endsWith("LessThanEqual")) {
+			key = key.replace("LessThanEqual", "");
+			return {
+				[key]: { lte: value },
+			};
+		} else if (key.endsWith("LessThan")) {
+			key = key.replace("LessThan", "");
+			return {
+				[key]: { lt: value },
+			};
+		} else if (key.endsWith("Contains")) {
+			key = key.replace("Contains", "");
+			return {
+				[key]: { contains: value },
+			};
+		} else if (key.endsWith("Equals")) {
+			key = key.replace("Equals", "");
+			return {
+				[key]: { equals: value },
+			};
+		} else if (key.endsWith("Before")) {
+			key = key.replace("Before", "");
+			return {
+				[key]: { lte: new Date(value) },
+			};
+		} else if (key.endsWith("After")) {
+			key = key.replace("After", "");
+			return {
+				[key]: { gte: new Date(value) },
+			};
+		} else if (key.endsWith("EndsWith")) {
+			key = key.replace("EndsWith", "");
+			return {
+				[key]: { endsWith: value },
+			};
+		} else if (key.endsWith("StartsWith")) {
+			key = key.replace("StartsWith", "");
+			return {
+				[key]: { startsWith: value },
+			};
+		} else if (key.endsWith("In")) {
+			key = key.replace("In", "");
+			value = value.split(",");
+			return {
+				[key]: { in: value },
+			};
+		} else if (key.endsWith("Has")) {
+      key = key.replace("Has", "");
+			value = value.split(",");
+			return {
+				[key]: { has: value },
+			};
+    }
+	}
 
 	generateFilters(querys) {
 		const filters = {
@@ -9,77 +89,17 @@ class PrismaFiltersGenerator {
 		};
 
 		for (const query in querys) {
-			if (query.endsWith("GreaterThanEqual")) {
-				const key = query.replace("GreaterThanEqual", "");
-				const value = querys[query];
-				filters.AND.push({
-					[key]: { gte: value },
-				});
-			} else if (query.endsWith("GreaterThan")) {
-				const key = query.replace("GreaterThan", "");
-				const value = querys[query];
-				filters.AND.push({
-					[key]: { gt: value },
-				});
-			} else if (query.endsWith("LessThanEqual")) {
-				const key = query.replace("LessThanEqual", "");
-				const value = querys[query];
-				filters.AND.push({
-					[key]: { lte: value },
-				});
-			} else if (query.endsWith("LessThan")) {
-				const key = query.replace("LessThan", "");
-				const value = querys[query];
-				filters.AND.push({
-					[key]: { lt: value },
-				});
-			} else if (query.endsWith("Contains")) {
-				const key = query.replace("Contains", "");
-				const value = querys[query];
-				filters.AND.push({
-					[key]: { contains: value },
-				});
-			} else if (query.endsWith("Equal")) {
-				const key = query.replace("Equal", "");
-				const value = querys[query];
-				filters.AND.push({
-					[key]: { equal: value },
-				});
-			} else if (query.endsWith("Before")) {
-				const key = query.replace("Before", "");
-				const value = querys[query];
-				filters.AND.push({
-					[key]: { lte: new Date(value) },
-				});
-			} else if (query.endsWith("After")) {
-				const key = query.replace("After", "");
-				const value = querys[query];
-				filters.AND.push({
-					[key]: { gte: new Date(value) },
-				});
-			} else if (query.endsWith("EndsWith")) {
-				const key = query.replace("EndsWith", "");
-				const value = querys[query];
-				filters.AND.push({
-					[key]: { endsWith: value },
-				});
-			} else if (query.endsWith("StartsWith")) {
-				const key = query.replace("StartsWith", "");
-				const value = querys[query];
-				filters.AND.push({
-					[key]: { startsWith: value },
-				});
-			} else if (query.endsWith("In")) {
-				const key = query.replace("In", "");
-				const value = querys[query].split(",");
-				filters.AND.push({
-					[key]: { in: value },
-				});
+			if (query.startsWith("$relation")) {
+				filters.AND.push(this.generateRealtionFilter(query, querys[query]));
+			} else {
+				filters.AND.push(this.generateFilter(query, querys[query]));
 			}
 		}
 		return filters;
 	}
 }
+
+// realtionManyTableFieldConstraint
 
 const prismaFiltersGenerator = new PrismaFiltersGenerator();
 
@@ -103,6 +123,5 @@ const prismaFiltersGenerator = new PrismaFiltersGenerator();
  *
  * @arguments equal{field}(value), after{field}(value), before{field}(value), gte{field}(value), lastWeeks{field}(value), lastMonths{field}(value), lastYears{field}(value), lastDays{field}(value), isNull{field}(),
  */
-
 
 module.exports = prismaFiltersGenerator;
